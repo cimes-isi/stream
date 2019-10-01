@@ -18,8 +18,42 @@ stream_c.exe: stream.c
 stream.omp.exe: stream.c
 	$(CC) $(CFLAGS) $(CFLAGS_OMP) stream.c -o stream.omp.exe
 
+# Xeon Gold 6154 L3 cache = 24.75 MiB
+# STREAM requires total data size to be >= 4x total LLC
+# data type is `double` (8 bytes)
+# 24.75 MiB * 4 = 99 MiB = 103809024 bytes / 8 b/elem = 12976128 elems < 16M
+stream.omp.16M.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=16000000 stream.c -o stream.omp.16M.exe
+
+# 16M * 12 sockets = 192M
+# 192M elem =~ 1.5 GB... multiple arrays --> >2 GB stack --> mcmodel=medium
+stream.omp.192M.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.192M.exe
+
+stream.omp.AVX512.16M.exe: stream.c
+	$(CC) -march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 \
+		$(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=16000000 stream.c -o stream.omp.AVX512.16M.exe
+
+stream.omp.AVX512.192M.exe: stream.c
+	$(CC) -march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 \
+		$(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.AVX512.192M.exe
+
+stream.omp.16M.icc: stream.c
+	icc $(CFLAGS) -qopenmp -DSTREAM_ARRAY_SIZE=16000000 stream.c -o stream.omp.16M.icc
+
+stream.omp.192M.icc: stream.c
+	icc $(CFLAGS) -qopenmp -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.192M.icc
+
+stream.omp.AVX512.16M.icc: stream.c
+	icc -xCORE-AVX512 -qopt-zmm-usage=high -O3 -vec-threshold0 \
+		-qopenmp -DSTREAM_ARRAY_SIZE=16000000 stream.c -o stream.omp.AVX512.16M.icc
+
+stream.omp.AVX512.192M.icc: stream.c
+	icc -xCORE-AVX512 -qopt-zmm-usage=high -O3 -vec-threshold0 \
+		-qopenmp -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.AVX512.192M.icc
+
 clean:
-	rm -f *.exe *.o
+	rm -f *.exe *.icc *.o
 
 # an example of a more complex build line for the Intel icc compiler
 stream.icc: stream.c
