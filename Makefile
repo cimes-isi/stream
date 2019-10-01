@@ -19,7 +19,7 @@ stream.omp.exe: stream.c
 	$(CC) $(CFLAGS) $(CFLAGS_OMP) stream.c -o stream.omp.exe
 
 clean:
-	rm -f stream_f.exe stream_c.exe stream.omp.exe *.o
+	rm -f *.exe *.o
 
 # an example of a more complex build line for the Intel icc compiler
 stream.icc: stream.c
