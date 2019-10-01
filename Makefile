@@ -1,10 +1,11 @@
 CC = gcc
 CFLAGS = -O2
+CFLAGS_OMP = -fopenmp
 
 FF = gfortran
 FFLAGS = -O2
 
-all: stream_f.exe stream_c.exe
+all: stream_f.exe stream_c.exe stream.omp.exe
 
 stream_f.exe: stream.f mysecond.o
 	$(CC) $(CFLAGS) -c mysecond.c
@@ -14,8 +15,11 @@ stream_f.exe: stream.f mysecond.o
 stream_c.exe: stream.c
 	$(CC) $(CFLAGS) stream.c -o stream_c.exe
 
+stream.omp.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) stream.c -o stream.omp.exe
+
 clean:
-	rm -f stream_f.exe stream_c.exe *.o
+	rm -f stream_f.exe stream_c.exe stream.omp.exe *.o
 
 # an example of a more complex build line for the Intel icc compiler
 stream.icc: stream.c
