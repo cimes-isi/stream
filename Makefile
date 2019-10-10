@@ -52,6 +52,10 @@ stream.omp.AVX512.192M.icc: stream.c
 	icc -xCORE-AVX512 -qopt-zmm-usage=high -O3 -vec-threshold0 \
 		-qopenmp -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.AVX512.192M.icc
 
+stream.omp.AVX512.ss.192M.icc: stream.c
+	icc -xCORE-AVX512 -qopt-zmm-usage=high -O3 -vec-threshold0 -qopt-streaming-stores=always \
+		-qopenmp -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.AVX512.ss.192M.icc
+
 clean:
 	rm -f *.exe *.icc *.o
 
