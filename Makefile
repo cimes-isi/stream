@@ -56,6 +56,26 @@ stream.omp.AVX512.ss.192M.icc: stream.c
 	icc -xCORE-AVX512 -qopt-zmm-usage=high -O3 -vec-threshold0 -qopt-streaming-stores=always \
 		-qopenmp -DSTREAM_ARRAY_SIZE=192000000 -mcmodel=medium stream.c -o stream.omp.AVX512.ss.192M.icc
 
+# Xeon Platinum 8168 L3 cache = 33 MiB
+# 33 * 4 = 132 MiB = 1.384e+8 bytes / 8 b/elem = 17300000 elems < 24M
+stream.omp.24M.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=24000000 stream.c -o stream.omp.24M.exe
+
+# 24M * 12 sockets = 288M
+stream.omp.288M.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=288000000 -mcmodel=medium stream.c -o stream.omp.288M.exe
+
+stream.omp.AVX512.288M.exe: stream.c
+	$(CC) -march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 \
+		$(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=288000000 -mcmodel=medium stream.c -o stream.omp.AVX512.288M.exe
+
+stream.omp.1024M.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=1024000000 -mcmodel=medium stream.c -o stream.omp.1024M.exe
+
+stream.omp.AVX512.1024M.exe: stream.c
+	$(CC) -march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 \
+		$(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=1024000000 -mcmodel=medium stream.c -o stream.omp.AVX512.1024M.exe
+
 clean:
 	rm -f *.exe *.icc *.o
 
