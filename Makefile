@@ -76,6 +76,9 @@ stream.omp.AVX512.1024M.exe: stream.c
 	$(CC) -march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 \
 		$(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=1024000000 -mcmodel=medium stream.c -o stream.omp.AVX512.1024M.exe
 
+stream.omp.1024M.100N.exe: stream.c
+	$(CC) $(CFLAGS) $(CFLAGS_OMP) -DSTREAM_ARRAY_SIZE=1024000000 -DNTIMES=100 -mcmodel=medium stream.c -o stream.omp.1024M.100N.exe
+
 clean:
 	rm -f *.exe *.icc *.o
 
